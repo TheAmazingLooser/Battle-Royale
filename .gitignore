@@ -8,5 +8,7 @@ src/game/generated
 SDL.dll
 freetype.dll
 
+autoexec.cfg
+
 teeworlds.*
 teeworlds_srv.*
