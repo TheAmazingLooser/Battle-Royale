@@ -7,3 +7,6 @@ objs
 src/game/generated
 SDL.dll
 freetype.dll
+
+teeworlds.*
+teeworlds_srv.*
