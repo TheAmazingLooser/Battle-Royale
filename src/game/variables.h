@@ -178,8 +178,8 @@ MACRO_CONFIG_INT(SvExplosiveSelfdamageAuto, sv_explosive_selfdamage_auto, 1, 0, 
 
 // Gameplay Vars
 MACRO_CONFIG_INT(SvMinPlayers, sv_min_players, 5, 2, 16, CFGFLAG_SERVER, "Number of players needed for the start!")
-MACRO_CONFIG_INT(SvAntiZoom, sv_anti_zoom, 1, 0, 1, CFGFLAG_SERVER, "Enable anti zoom! Causes huge laggs.")
-MACRO_CONFIG_INT(SvAntiZoomNum, sv_anti_zoom_num, 8000, 0, 10000, CFGFLAG_SERVER, "Number of useless objects which get generated!.")
+//MACRO_CONFIG_INT(SvAntiZoom, sv_anti_zoom, 1, 0, 1, CFGFLAG_SERVER, "Enable anti zoom!")
+//MACRO_CONFIG_INT(SvAntiZoomNum, sv_anti_zoom_num, 0, 0, 10000, CFGFLAG_SERVER, "Number of useless objects which get generated!.")
 
 
 // debug

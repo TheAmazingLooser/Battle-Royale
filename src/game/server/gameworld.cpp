@@ -4,6 +4,7 @@
 #include "gameworld.h"
 #include "entity.h"
 #include "gamecontext.h"
+#include <game/server/entities/wall.h>
 
 //////////////////////////////////////////////////
 // game world
@@ -127,7 +128,7 @@ void CGameWorld::Reset()
 
 	GameServer()->m_pController->PostReset();
 	RemoveEntities();
-
+	new CWall(&GameServer()->m_World);
 	m_ResetRequested = false;
 }
 

@@ -16,6 +16,10 @@ CWall::CWall(CGameWorld *pGameWorld)
 	m_BLPos = vec2(ExtraPos, GameServer()->Collision()->GetHeight()*32-ExtraPos);
 	m_BRPos = vec2( GameServer()->Collision()->GetWidth()*32-ExtraPos, GameServer()->Collision()->GetHeight()*32-ExtraPos);
 	m_EndPos = vec2((3+(rand()%(GameServer()->Collision()->GetWidth()-4)))*32, (3+(rand()%(GameServer()->Collision()->GetHeight()-4)))*32);
+	m_LeftGrow = (m_EndPos.x -m_TLPos.x)*33/100;
+	m_RightGrow = (m_TRPos.x-m_EndPos.x)*33/100;
+	m_TopGrow = (m_EndPos.y-m_TLPos.y)*33/100;
+	m_BotGrow = (m_EndPos.y - m_BLPos.y)*33/100;
 	m_StartTick =  0;
 	
 	//Noobstyle...
@@ -24,12 +28,10 @@ CWall::CWall(CGameWorld *pGameWorld)
 	m_Id3 = Server()->SnapNewID();
 	m_Id4 = Server()->SnapNewID();
 
-	m_MoveTick = -1;
+	m_MoveTick = Server()->Tick();
 	m_Moving = false;
 
-	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "Pos ='%f %f' ",m_EndPos.x,m_EndPos.y);
-	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+	GameServer()->SendBroadcast("A wall has got spawned. Prepare for something shitty!", -1);
 
 	GameWorld()->InsertEntity(this);
 }
@@ -46,12 +48,9 @@ void CWall::StartMove()
 	// PosCalc
 	m_LeftGrow = (m_EndPos.x-m_TLPos.x)*33/100;
 	m_RightGrow = (m_TRPos.x-m_EndPos.x)*33/100;
-	m_TopGrow = (m_TLPos.y-m_EndPos.y)*33/100;
+	m_TopGrow = (m_EndPos.y-m_TLPos.y)*33/100;
 	m_BotGrow = (m_EndPos.y - m_BLPos.y)*33/100;
-
-	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "Top ='%f Bot = %f Right = %f Left = %f' ",m_TopGrow,m_BotGrow,m_RightGrow,m_LeftGrow);
-	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+	GameServer()->SendBroadcast("The wall begin to shrink", -1);
 }
 
 
@@ -82,12 +81,16 @@ void CWall::HitBehind()
 		if(p->m_Pos.x < m_TLPos.x || p->m_Pos.x < m_BLPos.x || p->m_Pos.x > m_BRPos.x || p->m_Pos.x > m_TRPos.x || p->m_Pos.y < m_TRPos.y || p->m_Pos.y < m_TLPos.y || p->m_Pos.y > m_BRPos.y || p->m_Pos.y > m_BLPos.y)
 		{
 			p->TakeDamage(vec2(0.1f, 0.1f), g_Config.m_SvWallDamage, -1, WEAPON_NINJA);
+			GameServer()->SendBroadcast("You are behind the wall!", p->GetPlayer()->GetCID());
 		}
 	}
+
 }
 
 void CWall::Tick()
 {
+	char aBuf[256];
+	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 	int Delay = g_Config.m_SvWallDamageTickDelay;
 	if(Server()->Tick()%Delay == 0 or Delay < 2)
 	{
@@ -97,7 +100,6 @@ void CWall::Tick()
 		HitCharacter(m_TRPos,m_BRPos);
 		HitBehind();
 	}
-
 	if (m_MoveTick != -1 && m_MoveTick +9000 < Server()->Tick() && !m_Moving)
 	{
 		StartMove();
@@ -105,9 +107,8 @@ void CWall::Tick()
 	{
 		m_Moving = false;
 	} else {
-		if (Server()->Tick()%50 == 0)
+		if (Server()->Tick()%50 == 0 && m_Moving)
 		{
-			//GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", "Moving");
 			if (m_TLPos.x < m_LeftGrow)
 				m_TLPos.x += 32;
 
@@ -121,10 +122,10 @@ void CWall::Tick()
 				m_BRPos.x -= 32;
 
 			// Y
-			if (m_TLPos.y < m_BotGrow)
+			if (m_TLPos.y < m_TopGrow)
 				m_TLPos.y += 32;
 
-			if (m_TRPos.y < m_BotGrow)
+			if (m_TRPos.y < m_TopGrow)
 				m_TRPos.y += 32;
 
 			if (m_BLPos.y > m_BotGrow)

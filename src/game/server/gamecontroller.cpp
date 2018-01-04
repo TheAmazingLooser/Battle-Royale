@@ -214,7 +214,6 @@ void IGameController::StartRound()
 {
 	ResetGame();
 	m_IsStarted = true;
-	//new CWall(GameWorld());
 	m_RoundStartTick = Server()->Tick();
 	m_SuddenDeath = 0;
 	m_GameOverTick = -1;
@@ -223,6 +222,7 @@ void IGameController::StartRound()
 	m_aTeamscore[TEAM_BLUE] = 0;
 	m_ForceBalanced = false;
 	Server()->DemoRecorder_HandleAutoStart();
+	GameServer()->SendChat(-1, CGameContext::CHAT_ALL, "Round Started! Good luck!");
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "start round type='%s' teamplay='%d'", m_pGameType, m_GameFlags&GAMEFLAG_TEAMS);
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
@@ -467,13 +467,6 @@ void IGameController::Tick()
 		}
 	}
 
-	if (NumPlayers >= g_Config.m_SvMinPlayers && !m_IsStarted)
-	{
-
-		StartRound();
-		m_IsStarted = true;
-	}
-
 	if(!GameServer()->m_World.m_Paused && m_Warmup && m_IsStarted)
 	{
 		m_Warmup--;
@@ -496,6 +489,13 @@ void IGameController::Tick()
 		--m_UnpauseTimer;
 		if(!m_UnpauseTimer)
 			GameServer()->m_World.m_Paused = false;
+	}
+
+
+	if (NumPlayers >= g_Config.m_SvMinPlayers && !m_IsStarted)
+	{
+		m_IsStarted = true;
+		StartRound();
 	}
 
 	// game is Paused

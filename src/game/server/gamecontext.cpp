@@ -560,8 +560,7 @@ void CGameContext::OnClientEnter(int ClientID)
 		{
 			str_format(aBuf, sizeof(aBuf), "There %s %d more %s missing!", g_Config.m_SvMinPlayers - NumPlayers > 1 ? "are" : "is", g_Config.m_SvMinPlayers-NumPlayers, g_Config.m_SvMinPlayers-NumPlayers > 1 ?  "players" : "player"); //
 			SendChat(-1, CGameContext::CHAT_ALL, aBuf);
-		} else
-			SendChat(-1, CGameContext::CHAT_ALL, "Round Started! Good luck!");
+		}
 	}
 
 	str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d", ClientID, Server()->ClientName(ClientID), m_apPlayers[ClientID]->GetTeam());
